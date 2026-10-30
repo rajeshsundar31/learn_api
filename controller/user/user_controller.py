@@ -9,18 +9,18 @@ from model.user.user_detail_model import UserCreationModel, ResponseUserModel
 from starlette import status
 
 
-user_route = APIRouter()
+route = APIRouter()
 
 db_session = Annotated[Session, Depends(get_db)]
 
 
-@user_route.get("/getuser", response_model=list[ResponseUserModel], status_code=status.HTTP_200_OK)
+@route.get("/getuser", response_model=list[ResponseUserModel], status_code=status.HTTP_200_OK)
 def get_user(db: db_session):
     listofUsers = select(User)
     return db.scalars(listofUsers).all()
 
 
-@user_route.post("/addUser", status_code=status.HTTP_201_CREATED)
+@route.post("/addUser", status_code=status.HTTP_201_CREATED)
 def add_user(db: db_session, user_data: UserCreationModel):
     new_user = User(**user_data.model_dump())
 
@@ -30,7 +30,7 @@ def add_user(db: db_session, user_data: UserCreationModel):
 
     return new_user
 
-@user_route.put("/updateuser/{user_id}", status_code=status.HTTP_200_OK)
+@route.put("/updateuser/{user_id}", status_code=status.HTTP_200_OK)
 def update_user(db:db_session, user_id: int, userDate: UserCreationModel):
     find_user = db.get(User, user_id)
     if find_user is None:
@@ -46,7 +46,7 @@ def update_user(db:db_session, user_id: int, userDate: UserCreationModel):
 
     return find_user
 
-@user_route.delete("/deleteuser/{user_id}")
+@route.delete("/deleteuser/{user_id}")
 def delete_user(db:db_session, user_id:int = Path(gt=0)):
     deleted_user = db.get(User, user_id)
     if deleted_user is None:
