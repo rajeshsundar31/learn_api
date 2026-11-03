@@ -2,7 +2,7 @@ from pydantic import BaseModel, Field, ConfigDict, EmailStr
 
 
 class UserCreationModel(BaseModel):
-    name:str = Field(min_length=5, max_length=22)
+    name:str = Field(min_length=5, max_length=50)
     email:EmailStr
     password: str
 
