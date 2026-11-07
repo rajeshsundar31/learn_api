@@ -82,7 +82,7 @@ def validate_user(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="UnAuthorized user!")
     access_token = create_access_token(user.name, user.id, timedelta(minutes=20))
 
-    return {"access_token": access_token, "token_type": "bearer"}
+    return {"token": access_token, "token_type": "bearer"}
 
 
 # @route.get("/getuser", response_model=list[ResponseUserModel], status_code=status.HTTP_200_OK)
