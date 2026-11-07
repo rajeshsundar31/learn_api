@@ -36,3 +36,21 @@ async def get_expense_details(db:db_session, user: user_dependency):
     expense_detail = db.query(Expense).filter(Expense.owner_id == user.get('id')).all()
     
     return expense_detail
+
+@expense_router.get("/detail/{detail_id}", response_model=ExpenseResponse)
+async def get_particular_detail(db: db_session, detail_id: int, user: user_dependency):
+    if user is None:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="UnAuthorized User!")
+
+    detail = db.query(Expense).filter(
+        Expense.id == detail_id,
+        Expense.owner_id == user["id"]
+    ).first()
+
+    if detail is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Expense not found!"
+        )
+
+    return detail
