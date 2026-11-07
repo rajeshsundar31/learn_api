@@ -44,7 +44,6 @@ async def get_particular_detail(db: db_session, detail_id: int, user: user_depen
 
     detail = db.query(Expense).filter(
         Expense.id == detail_id,
-        Expense.owner_id == user["id"]
     ).first()
 
     if detail is None:
