@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, Depends, Path
 from sqlalchemy.orm import Session
 from typing import Annotated
 from database.database import get_db
-from model.model_db import Expense
+from model.model_db import Expense, User
 from model.expense.expense_detail_model import ExpenseCreationModel, ExpenseResponse
 from starlette import status
 from controller.user.user_controller import verifiy_current_user
@@ -53,3 +53,15 @@ async def get_particular_detail(db: db_session, detail_id: int, user: user_depen
         )
 
     return detail
+
+@expense_router.get("/username")
+async def get_userName(db: db_session, user: user_dependency):
+    if user is None:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="UnAuthorized User!")
+
+    username = db.query(User).filter(User.id == user.get('id')).first()
+
+    if username is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Name not Found!")
+
+    return {"username": username.name}
