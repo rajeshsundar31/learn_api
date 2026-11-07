@@ -28,7 +28,7 @@ async def add_expense(db: db_session, user: user_dependency, expense_dict: Expen
     db.commit()
     return add_spend
 
-@expense_router.get("/getdetails", response_model=ExpenseResponse, status_code=status.HTTP_200_OK)
+@expense_router.get("/getdetails", response_model=list[ExpenseResponse], status_code=status.HTTP_200_OK)
 async def get_expense_details(db:db_session, user: user_dependency):
     if user is None:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='UnAuthoriized user!!')
