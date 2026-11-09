@@ -46,8 +46,8 @@ def add_user(db: db_session, user_data: UserCreationModel):
 
     return new_user
 
-def verifiy_user(username: str, password: str, db):
-    user_verifiy = db.query(User).filter(User.name == username).first()
+def verifiy_user(email: str, password: str, db):
+    user_verifiy = db.query(User).filter(User.email == email).first()
 
     if user_verifiy is None:
         return False
@@ -55,8 +55,8 @@ def verifiy_user(username: str, password: str, db):
         return False
     return user_verifiy
 
-def create_access_token(username:str, user_id:int, expire_at: timedelta):
-    encode = {'sub': username, 'id': user_id}
+def create_access_token(email:str, user_id:int, expire_at: timedelta):
+    encode = {'sub': email, 'id': user_id}
     expires = datetime.now(timezone.utc) + expire_at
     encode.update({'exp': expires})
     return jwt.encode(encode, SECRET_KEY, algorithm=ALGORITHM)
@@ -64,12 +64,12 @@ def create_access_token(username:str, user_id:int, expire_at: timedelta):
 async def verifiy_current_user(token: Annotated[str, Depends(oauth_password_bearer)]):
     try :
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        username: str = payload.get('sub')
+        email: str = payload.get('sub')
         user_id: int = payload.get('id')
 
-        if username is None or user_id is None:
+        if email is None or user_id is None:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="UnAuthorized user!")
-        return {'username': username, 'id': user_id}
+        return {'email': email, 'id': user_id}
     except JWTError:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="UnAuthorized user!")
 
@@ -82,7 +82,7 @@ def validate_user(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="UnAuthorized user!")
     access_token = create_access_token(user.name, user.id, timedelta(minutes=20))
 
-    return {"token": access_token, "token_type": "bearer"}
+    return {"access_token": access_token, "token_type": "bearer"}
 
 
 # @route.get("/getuser", response_model=list[ResponseUserModel], status_code=status.HTTP_200_OK)

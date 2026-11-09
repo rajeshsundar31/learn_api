@@ -65,3 +65,15 @@ async def get_userName(db: db_session, user: user_dependency):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Name not Found!")
 
     return {"username": username.name}
+
+@expense_router.delete("/detail/{id}")
+async def delete_expense_detail(db: db_session, user: user_dependency, id: int):
+    if user is None:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User Not Found!")
+
+    del_detail = db.query(Expense).filter(Expense.id == id).first()
+
+    db.delete(del_detail)
+    db.commit()
+
+    return {"message": "Deletion Successfully!!"}
