@@ -73,6 +73,9 @@ async def delete_expense_detail(db: db_session, user: user_dependency, id: int):
 
     del_detail = db.query(Expense).filter(Expense.id == id).first()
 
+    if del_detail is None:
+        raise HTTPException(status_code=status.HTTP_204_NO_CONTENT, detail="Details Not Found!")
+
     db.delete(del_detail)
     db.commit()
 
