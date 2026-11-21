@@ -7,7 +7,7 @@ from typing import Annotated
 from dotenv import load_dotenv
 from database.database import get_db
 from model.model_db import User
-from model.user.user_detail_model import UserCreationModel, ResponseUserModel
+from model.user.user_detail_model import UserCreationModel, ResetPasswordModel
 from starlette import status
 from passlib.context import CryptContext
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
@@ -84,6 +84,24 @@ def validate_user(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db
 
     return {"access_token": access_token, "token_type": "bearer"}
 
+@route.post("/verifiy-user/{email}", status_code=status.HTTP_202_ACCEPTED)
+def verifiyUserEmail(db: db_session, email : str):
+    verifiy_user_email = db.query(User).filter(User.email == email).first()
+
+    if verifiy_user_email is None:
+         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="UnAuthorized user!")
+    return {"message": "User verification successful"}
+
+@route.put("/reset-password/{email}")
+def resetPassword(db: db_session, password: ResetPasswordModel, email: str):
+    find_user_email = db.query(User).filter(User.email == email).first()
+
+    if find_user_email is not None:
+        find_user_email.password = bcrypt_context.hash(password.new_password)
+
+        db.commit()
+        db.refresh(find_user_email)
+    return find_user_email
 
 # @route.get("/getuser", response_model=list[ResponseUserModel], status_code=status.HTTP_200_OK)
 # def get_user(db: db_session):

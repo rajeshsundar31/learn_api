@@ -7,6 +7,9 @@ class UserCreationModel(BaseModel):
     password: str
 
 
+class ResetPasswordModel(BaseModel):
+    new_password: str = Field(min_length=8)
+
 class ResponseUserModel(UserCreationModel):
     id:int
 
