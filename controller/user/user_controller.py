@@ -40,6 +40,13 @@ def add_user(db: db_session, user_data: UserCreationModel):
         password = bcrypt_context.hash(user_data.password)
     )
 
+    existing_user = db.query(User).filter(User.email == new_user.email).first()
+
+    if existing_user is not None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User already Exisit1!")
+        
+
+
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
